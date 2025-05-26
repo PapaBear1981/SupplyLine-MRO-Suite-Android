@@ -1,0 +1,62 @@
+<resources>
+    <string name="app_name">SupplyLine MRO Suite</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_tools">Tools</string>
+    <string name="nav_chemicals">Chemicals</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_scanner">Scanner</string>
+
+    <!-- Common -->
+    <string name="search">Search</string>
+    <string name="filter">Filter</string>
+    <string name="add">Add</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="loading">Loading...</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+
+    <!-- Login -->
+    <string name="welcome_back">Welcome Back</string>
+    <string name="sign_in_subtitle">Sign in to access your aerospace tools</string>
+    <string name="employee_number">Employee Number</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+
+    <!-- Dashboard -->
+    <string name="quick_overview">Quick Overview</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="recent_activity">Recent Activity</string>
+    <string name="alerts_notifications">Alerts &amp; Notifications</string>
+    <string name="scan_tool">Scan Tool</string>
+    <string name="view_tools">View Tools</string>
+
+    <!-- Tools -->
+    <string name="search_tools">Search tools...</string>
+    <string name="add_tool">Add Tool</string>
+    <string name="tool_details">Tool Details</string>
+    <string name="checkout_tool">Checkout Tool</string>
+    <string name="return_tool">Return Tool</string>
+
+    <!-- Chemicals -->
+    <string name="search_chemicals">Search chemicals...</string>
+    <string name="add_chemical">Add Chemical</string>
+    <string name="chemical_details">Chemical Details</string>
+    <string name="issue_chemical">Issue Chemical</string>
+
+    <!-- Status -->
+    <string name="available">Available</string>
+    <string name="checked_out">Checked Out</string>
+    <string name="overdue">Overdue</string>
+    <string name="maintenance">Maintenance</string>
+    <string name="good">Good</string>
+    <string name="expiring">Expiring</string>
+    <string name="expired">Expired</string>
+    <string name="low_stock">Low Stock</string>
+</resources>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Legacy colors -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Aerospace-inspired color palette -->
+    <!-- Primary colors - Deep space blues -->
+    <color name="aerospace_primary">#1A237E</color>
+    <color name="aerospace_primary_variant">#0D1B69</color>
+    <color name="aerospace_primary_light">#534BAE</color>
+
+    <!-- Secondary colors - Metallic silver/chrome -->
+    <color name="aerospace_secondary">#37474F</color>
+    <color name="aerospace_secondary_variant">#263238</color>
+    <color name="aerospace_secondary_light">#62727B</color>
+
+    <!-- Accent colors - Electric blue/cyan -->
+    <color name="aerospace_accent">#00BCD4</color>
+    <color name="aerospace_accent_variant">#0097A7</color>
+    <color name="aerospace_accent_light">#4DD0E1</color>
+
+    <!-- Surface colors -->
+    <color name="aerospace_surface">#FAFAFA</color>
+    <color name="aerospace_surface_variant">#F5F5F5</color>
+    <color name="aerospace_background">#FFFFFF</color>
+
+    <!-- Status colors -->
+    <color name="aerospace_success">#4CAF50</color>
+    <color name="aerospace_warning">#FF9800</color>
+    <color name="aerospace_error">#F44336</color>
+    <color name="aerospace_info">#2196F3</color>
+
+    <!-- Text colors -->
+    <color name="aerospace_on_primary">#FFFFFF</color>
+    <color name="aerospace_on_secondary">#FFFFFF</color>
+    <color name="aerospace_on_surface">#212121</color>
+    <color name="aerospace_on_background">#212121</color>
+
+    <!-- Dark theme colors -->
+    <color name="aerospace_primary_dark">#0D47A1</color>
+    <color name="aerospace_surface_dark">#121212</color>
+    <color name="aerospace_background_dark">#000000</color>
+    <color name="aerospace_on_surface_dark">#FFFFFF</color>
+    <color name="aerospace_on_background_dark">#FFFFFF</color>
+
+    <!-- Gradient colors for stunning effects -->
+    <color name="gradient_start">#1A237E</color>
+    <color name="gradient_middle">#3F51B5</color>
+    <color name="gradient_end">#00BCD4</color>
+
+    <!-- Tool status colors -->
+    <color name="tool_available">#4CAF50</color>
+    <color name="tool_checked_out">#FF9800</color>
+    <color name="tool_overdue">#F44336</color>
+    <color name="tool_maintenance">#9C27B0</color>
+
+    <!-- Chemical status colors -->
+    <color name="chemical_good">#4CAF50</color>
+    <color name="chemical_expiring">#FF9800</color>
+    <color name="chemical_expired">#F44336</color>
+    <color name="chemical_low_stock">#FF5722</color>
+</resources>
