@@ -1,14 +1,14 @@
 package com.example.supplyline_mro_suite.data.repository
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
+
 import com.example.supplyline_mro_suite.data.local.dao.UserDao
 import com.example.supplyline_mro_suite.data.model.User
 import com.example.supplyline_mro_suite.data.model.LoginRequest
 import com.example.supplyline_mro_suite.data.model.LoginResponse
 import com.example.supplyline_mro_suite.data.remote.ApiService
+import com.example.supplyline_mro_suite.data.remote.TokenManager
+import com.example.supplyline_mro_suite.data.remote.NetworkErrorHandler
+import com.example.supplyline_mro_suite.data.remote.NetworkResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -20,117 +20,109 @@ import javax.inject.Singleton
 class UserRepository @Inject constructor(
     private val userDao: UserDao,
     private val apiService: ApiService,
-    private val dataStore: DataStore<Preferences>
+    private val tokenManager: TokenManager,
+    private val networkErrorHandler: NetworkErrorHandler
 ) {
-    
-    companion object {
-        private val AUTH_TOKEN_KEY = stringPreferencesKey("auth_token")
-        private val USER_ID_KEY = stringPreferencesKey("user_id")
-        private val EMPLOYEE_NUMBER_KEY = stringPreferencesKey("employee_number")
-    }
-    
+
+
+
     // Authentication
-    suspend fun login(employeeNumber: String, password: String): Flow<Result<LoginResponse>> = flow {
-        try {
-            val request = LoginRequest(employeeNumber, password)
-            val response = apiService.login(request)
-            
-            if (response.isSuccessful) {
-                val loginResponse = response.body()!!
-                
+    suspend fun login(employeeNumber: String, password: String): Flow<NetworkResult<LoginResponse>> = flow {
+        emit(NetworkResult.Loading())
+
+        val request = LoginRequest(employeeNumber, password)
+        val result = networkErrorHandler.safeApiCall { apiService.login(request) }
+
+        when (result) {
+            is NetworkResult.Success -> {
+                val loginResponse = result.data
+
                 if (loginResponse.success && loginResponse.user != null) {
                     // Save user data locally
                     userDao.insertUser(loginResponse.user)
-                    
-                    // Save auth token and user info
-                    dataStore.edit { preferences ->
-                        loginResponse.token?.let { preferences[AUTH_TOKEN_KEY] = it }
-                        preferences[USER_ID_KEY] = loginResponse.user.id.toString()
-                        preferences[EMPLOYEE_NUMBER_KEY] = loginResponse.user.employeeNumber
+
+                    // Save auth token and user info using TokenManager
+                    loginResponse.token?.let { token ->
+                        tokenManager.saveTokens(token)
+                        tokenManager.saveUserInfo(
+                            loginResponse.user.id.toString(),
+                            loginResponse.user.employeeNumber
+                        )
                     }
-                    
-                    emit(Result.success(loginResponse))
+
+                    emit(NetworkResult.Success(loginResponse))
                 } else {
-                    emit(Result.failure(Exception(loginResponse.message)))
+                    emit(NetworkResult.Error(
+                        com.example.supplyline_mro_suite.data.remote.NetworkException.AuthenticationError(
+                            loginResponse.message
+                        )
+                    ))
                 }
-            } else {
-                emit(Result.failure(Exception("Login failed: ${response.message()}")))
             }
-        } catch (e: Exception) {
-            // Offline login - check local database
-            val user = userDao.getUserByEmployeeNumber(employeeNumber)
-            if (user != null) {
-                // In a real app, you'd verify the password hash
-                val offlineResponse = LoginResponse(
-                    success = true,
-                    message = "Offline login successful",
-                    user = user,
-                    token = null
-                )
-                
-                dataStore.edit { preferences ->
-                    preferences[USER_ID_KEY] = user.id.toString()
-                    preferences[EMPLOYEE_NUMBER_KEY] = user.employeeNumber
+            is NetworkResult.Error -> {
+                // Try offline login
+                val user = userDao.getUserByEmployeeNumber(employeeNumber)
+                if (user != null) {
+                    // In a real app, you'd verify the password hash
+                    val offlineResponse = LoginResponse(
+                        success = true,
+                        message = "Offline login successful",
+                        user = user,
+                        token = null
+                    )
+
+                    tokenManager.saveUserInfo(
+                        user.id.toString(),
+                        user.employeeNumber
+                    )
+
+                    emit(NetworkResult.Success(offlineResponse))
+                } else {
+                    emit(result) // Emit the original network error
                 }
-                
-                emit(Result.success(offlineResponse))
-            } else {
-                emit(Result.failure(Exception("Offline login failed: User not found")))
             }
+            is NetworkResult.Loading -> { /* Already emitted loading */ }
         }
     }
-    
-    suspend fun logout(): Flow<Result<Unit>> = flow {
-        try {
-            apiService.logout()
-            
-            // Clear local auth data
-            dataStore.edit { preferences ->
-                preferences.remove(AUTH_TOKEN_KEY)
-                preferences.remove(USER_ID_KEY)
-                preferences.remove(EMPLOYEE_NUMBER_KEY)
-            }
-            
-            emit(Result.success(Unit))
-        } catch (e: Exception) {
-            // Clear local data even if server call fails
-            dataStore.edit { preferences ->
-                preferences.remove(AUTH_TOKEN_KEY)
-                preferences.remove(USER_ID_KEY)
-                preferences.remove(EMPLOYEE_NUMBER_KEY)
-            }
-            
-            emit(Result.success(Unit))
+
+    suspend fun logout(): Flow<NetworkResult<Unit>> = flow {
+        emit(NetworkResult.Loading())
+
+        val result = networkErrorHandler.safeApiCall { apiService.logout() }
+
+        // Clear local data regardless of server response
+        tokenManager.clearTokens()
+
+        when (result) {
+            is NetworkResult.Success -> emit(NetworkResult.Success(Unit))
+            is NetworkResult.Error -> emit(NetworkResult.Success(Unit)) // Still success since we cleared local data
+            is NetworkResult.Loading -> { /* Already emitted loading */ }
         }
     }
-    
-    suspend fun getCurrentUser(): Flow<User?> {
-        return dataStore.data.map { preferences ->
-            val userId = preferences[USER_ID_KEY]?.toIntOrNull()
-            userId?.let { userDao.getUserById(it) }
-        }
+
+    suspend fun getCurrentUser(): User? {
+        val userId = tokenManager.getUserId()?.toIntOrNull()
+        return userId?.let { userDao.getUserById(it) }
     }
-    
+
     suspend fun isLoggedIn(): Boolean {
-        val preferences = dataStore.data.first()
-        return preferences[USER_ID_KEY] != null
+        return tokenManager.isLoggedIn()
     }
-    
+
     suspend fun getAuthToken(): String? {
-        val preferences = dataStore.data.first()
-        return preferences[AUTH_TOKEN_KEY]
+        return tokenManager.getAuthToken()
     }
-    
+
     // User management
     fun getAllActiveUsers(): Flow<List<User>> = userDao.getAllActiveUsers()
-    
+
     fun getAllUsers(): Flow<List<User>> = userDao.getAllUsers()
-    
+
     suspend fun getUserById(id: Int): User? = userDao.getUserById(id)
-    
-    suspend fun getUserByEmployeeNumber(employeeNumber: String): User? = 
+
+    suspend fun getUserByEmployeeNumber(employeeNumber: String): User? =
         userDao.getUserByEmployeeNumber(employeeNumber)
-    
+
     suspend fun syncUsers(): Flow<Result<List<User>>> = flow {
         try {
             val response = apiService.getUsers()
@@ -146,7 +138,7 @@ class UserRepository @Inject constructor(
             emit(Result.failure(e))
         }
     }
-    
+
     suspend fun createUser(user: User): Flow<Result<User>> = flow {
         try {
             val response = apiService.createUser(user)
@@ -161,7 +153,7 @@ class UserRepository @Inject constructor(
             emit(Result.failure(e))
         }
     }
-    
+
     suspend fun updateUser(user: User): Flow<Result<User>> = flow {
         try {
             val response = apiService.updateUser(user.id, user)
@@ -176,14 +168,14 @@ class UserRepository @Inject constructor(
             emit(Result.failure(e))
         }
     }
-    
+
     // Statistics
     suspend fun getUserStats(): UserStats {
         val totalUsers = userDao.getActiveUserCount()
         val maintenanceUsers = userDao.getUserCountByDepartment("Maintenance")
         val materialsUsers = userDao.getUserCountByDepartment("Materials")
         val adminUsers = userDao.getUserCountByDepartment("Admin")
-        
+
         return UserStats(
             totalUsers = totalUsers,
             maintenanceUsers = maintenanceUsers,
@@ -191,7 +183,7 @@ class UserRepository @Inject constructor(
             adminUsers = adminUsers
         )
     }
-    
+
     suspend fun hasLocalData(): Boolean {
         return userDao.getActiveUserCount() > 0
     }

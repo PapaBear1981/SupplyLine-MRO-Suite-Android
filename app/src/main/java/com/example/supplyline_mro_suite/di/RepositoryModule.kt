@@ -1,23 +1,22 @@
 package com.example.supplyline_mro_suite.di
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import com.example.supplyline_mro_suite.data.local.dao.*
 import com.example.supplyline_mro_suite.data.remote.ApiService
+import com.example.supplyline_mro_suite.data.remote.TokenManager
+import com.example.supplyline_mro_suite.data.remote.NetworkErrorHandler
 import com.example.supplyline_mro_suite.data.repository.*
-// Hilt temporarily disabled
-// import dagger.Module
-// import dagger.Provides
-// import dagger.hilt.InstallIn
-// import dagger.hilt.components.SingletonComponent
-// import javax.inject.Singleton
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
-// @Module
-// @InstallIn(SingletonComponent::class)
+@Module
+@InstallIn(SingletonComponent::class)
 object RepositoryModule {
 
-    // @Provides
-    // @Singleton
+    @Provides
+    @Singleton
     fun provideToolRepository(
         toolDao: ToolDao,
         toolCheckoutDao: ToolCheckoutDao,
@@ -26,8 +25,8 @@ object RepositoryModule {
         return ToolRepository(toolDao, toolCheckoutDao, apiService)
     }
 
-    // @Provides
-    // @Singleton
+    @Provides
+    @Singleton
     fun provideChemicalRepository(
         chemicalDao: ChemicalDao,
         chemicalIssuanceDao: ChemicalIssuanceDao,
@@ -36,13 +35,14 @@ object RepositoryModule {
         return ChemicalRepository(chemicalDao, chemicalIssuanceDao, apiService)
     }
 
-    // @Provides
-    // @Singleton
+    @Provides
+    @Singleton
     fun provideUserRepository(
         userDao: UserDao,
         apiService: ApiService,
-        dataStore: DataStore<Preferences>
+        tokenManager: TokenManager,
+        networkErrorHandler: NetworkErrorHandler
     ): UserRepository {
-        return UserRepository(userDao, apiService, dataStore)
+        return UserRepository(userDao, apiService, tokenManager, networkErrorHandler)
     }
 }
