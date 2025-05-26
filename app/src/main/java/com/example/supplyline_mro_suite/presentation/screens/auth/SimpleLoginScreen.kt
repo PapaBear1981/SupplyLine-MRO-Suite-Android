@@ -35,29 +35,67 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController) {
+fun SimpleLoginScreen(navController: NavController) {
     var employeeNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
-    
+
     val keyboardController = LocalSoftwareKeyboardController.current
     val passwordFocusRequester = remember { FocusRequester() }
-    
+
     // Animation states
     val animationProgress by animateFloatAsState(
         targetValue = 1f,
         animationSpec = tween(1000, easing = EaseOutCubic),
         label = "login_animation"
     )
-    
+
     val logoScale by animateFloatAsState(
         targetValue = if (isLoading) 0.8f else 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "logo_scale"
     )
-    
+
+    // Handle login
+    fun performLogin() {
+        when {
+            employeeNumber.isBlank() -> {
+                errorMessage = "Employee number is required"
+                return
+            }
+            password.isBlank() -> {
+                errorMessage = "Password is required"
+                return
+            }
+            password.length < 6 -> {
+                errorMessage = "Password must be at least 6 characters"
+                return
+            }
+        }
+
+        isLoading = true
+        errorMessage = ""
+    }
+
+    // Simulate authentication
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            delay(2000) // Simulate network call
+
+            // Simple validation - in real app this would be API call
+            if (employeeNumber == "ADMIN001" && password == "password123") {
+                navController.navigate(Screen.Dashboard.route) {
+                    popUpTo(Screen.Login.route) { inclusive = true }
+                }
+            } else {
+                errorMessage = "Invalid credentials. Try ADMIN001 / password123"
+                isLoading = false
+            }
+        }
+    }
+
     // Gradient background
     Box(
         modifier = Modifier
@@ -113,7 +151,7 @@ fun LoginScreen(navController: NavController) {
                     )
                 }
             }
-            
+
             // Login form
             Card(
                 modifier = Modifier
@@ -136,7 +174,7 @@ fun LoginScreen(navController: NavController) {
                         color = AerospacePrimary,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    
+
                     Text(
                         text = "Sign in to access your aerospace tools",
                         fontSize = 14.sp,
@@ -144,11 +182,14 @@ fun LoginScreen(navController: NavController) {
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(bottom = 32.dp)
                     )
-                    
+
                     // Employee Number field
                     OutlinedTextField(
                         value = employeeNumber,
-                        onValueChange = { employeeNumber = it },
+                        onValueChange = {
+                            employeeNumber = it
+                            errorMessage = ""
+                        },
                         label = { Text("Employee Number") },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -166,11 +207,14 @@ fun LoginScreen(navController: NavController) {
                             focusedLabelColor = AerospacePrimary
                         )
                     )
-                    
+
                     // Password field
                     OutlinedTextField(
                         value = password,
-                        onValueChange = { password = it },
+                        onValueChange = {
+                            password = it
+                            errorMessage = ""
+                        },
                         label = { Text("Password") },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -184,7 +228,9 @@ fun LoginScreen(navController: NavController) {
                         keyboardActions = KeyboardActions(
                             onDone = {
                                 keyboardController?.hide()
-                                // Trigger login
+                                if (employeeNumber.isNotEmpty() && password.isNotEmpty()) {
+                                    performLogin()
+                                }
                             }
                         ),
                         trailingIcon = {
@@ -201,28 +247,30 @@ fun LoginScreen(navController: NavController) {
                             focusedLabelColor = AerospacePrimary
                         )
                     )
-                    
+
                     // Error message
                     if (errorMessage.isNotEmpty()) {
-                        Text(
-                            text = errorMessage,
-                            color = AerospaceError,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = AerospaceError.copy(alpha = 0.1f)
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = errorMessage,
+                                color = AerospaceError,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(12.dp)
+                            )
+                        }
                     }
-                    
+
                     // Login button
                     Button(
-                        onClick = {
-                            isLoading = true
-                            // Simulate login process
-                            // In real implementation, this would call the login API
-                            // For now, navigate to dashboard after a delay
-                            navController.navigate(Screen.Dashboard.route) {
-                                popUpTo(Screen.Login.route) { inclusive = true }
-                            }
-                        },
+                        onClick = { performLogin() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
@@ -248,9 +296,9 @@ fun LoginScreen(navController: NavController) {
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(32.dp))
-            
+
             // Footer
             Text(
                 text = "Aerospace Maintenance Operations",
