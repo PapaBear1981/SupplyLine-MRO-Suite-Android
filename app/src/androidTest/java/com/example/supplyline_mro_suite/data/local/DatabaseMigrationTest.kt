@@ -33,7 +33,7 @@ class DatabaseMigrationTest {
             execSQL("INSERT INTO users (id, employee_number, name, department, is_admin, is_active) VALUES (1, 'EMP001', 'John Doe', 'Maintenance', 0, 1)")
             execSQL("INSERT INTO tools (id, tool_number, serial_number, description, category, location, status, requires_calibration) VALUES (1, 'T001', 'SN001', 'Test Tool', 'General', 'A1', 'Available', 0)")
             execSQL("INSERT INTO chemicals (id, part_number, lot_number, description, manufacturer, category, location, quantity, unit, expiration_date, minimum_stock_level, status, is_archived) VALUES (1, 'PN001', 'LOT001', 'Test Chemical', 'Manufacturer', 'Sealant', 'A1', 100.0, 'ml', '2025-12-31', 10.0, 'Good', 0)")
-            
+
             close()
         }
 
@@ -46,6 +46,15 @@ class DatabaseMigrationTest {
         assert(cursor.moveToFirst())
         assert(cursor.getString(cursor.getColumnIndexOrThrow("employee_number")) == "EMP001")
         cursor.close()
+
+        // Verify that indices were created during migration
+        val indexCursor = db.query("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='tools'")
+        var indexCount = 0
+        while (indexCursor.moveToNext()) {
+            indexCount++
+        }
+        indexCursor.close()
+        assert(indexCount > 0) // Should have indices on tools table
     }
 
     @Test

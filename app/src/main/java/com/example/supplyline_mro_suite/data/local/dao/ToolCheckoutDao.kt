@@ -66,31 +66,5 @@ interface ToolCheckoutDao {
     @Query("SELECT COUNT(*) FROM tool_checkouts WHERE is_active = 1 AND expected_return_date < date('now')")
     suspend fun getOverdueCheckoutCount(): Int
 
-    // Transaction methods for checkout/return operations
-    @Transaction
-    suspend fun checkoutTool(checkout: ToolCheckout, toolId: Int) {
-        insertCheckout(checkout)
-        updateToolStatus(toolId, "Checked Out")
-    }
-
-    @Transaction
-    suspend fun returnTool(checkoutId: Int, toolId: Int, returnCondition: String, returnNotes: String?) {
-        val checkout = getCheckoutById(checkoutId)
-        checkout?.let {
-            val updatedCheckout = it.copy(
-                isActive = false,
-                actualReturnDate = java.time.LocalDateTime.now().toString(),
-                returnCondition = returnCondition,
-                returnNotes = returnNotes
-            )
-            updateCheckout(updatedCheckout)
-            updateToolStatus(toolId, "Available")
-        }
-    }
-
-    @Query("UPDATE tools SET status = :status WHERE id = :toolId")
-    suspend fun updateToolStatus(toolId: Int, status: String)
-
-    @Query("SELECT COUNT(*) FROM tool_checkouts WHERE user_id = :userId AND is_active = 1")
-    suspend fun getActiveCheckoutCountForUser(userId: Int): Int
+    // Note: Transaction methods moved to repository layer to properly handle cross-DAO operations
 }

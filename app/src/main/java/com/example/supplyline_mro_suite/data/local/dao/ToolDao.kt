@@ -99,4 +99,8 @@ interface ToolDao {
         ORDER BY tc.expected_return_date ASC
     """)
     fun getOverdueTools(): Flow<List<Tool>>
+
+    // Tool status management
+    @Query("UPDATE tools SET status = :status WHERE id = :toolId")
+    suspend fun updateToolStatus(toolId: Int, status: String)
 }

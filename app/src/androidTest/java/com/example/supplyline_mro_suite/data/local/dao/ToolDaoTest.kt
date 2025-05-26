@@ -14,6 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.Assert.*
+import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
 class ToolDaoTest {
@@ -30,7 +31,7 @@ class ToolDaoTest {
             ApplicationProvider.getApplicationContext(),
             SupplyLineDatabase::class.java
         ).allowMainThreadQueries().build()
-        
+
         toolDao = database.toolDao()
     }
 
@@ -187,13 +188,16 @@ class ToolDaoTest {
 
     @Test
     fun getToolsDueSoonForCalibration() = runTest {
-        // Given
+        // Given - Use dynamic dates to avoid time-dependent test failures
+        val dueSoon = LocalDate.now().plusDays(5).toString()
+        val farFuture = LocalDate.now().plusYears(1).toString()
+
         val tools = listOf(
-            Tool(1, "T001", "SN001", "Tool 1", "General", "A1", "Available", 
-                 requiresCalibration = true, calibrationDueDate = "2024-01-15"),
-            Tool(2, "T002", "SN002", "Tool 2", "General", "A2", "Available", 
-                 requiresCalibration = true, calibrationDueDate = "2024-12-31"),
-            Tool(3, "T003", "SN003", "Tool 3", "General", "A3", "Available", 
+            Tool(1, "T001", "SN001", "Tool 1", "General", "A1", "Available",
+                 requiresCalibration = true, calibrationDueDate = dueSoon),
+            Tool(2, "T002", "SN002", "Tool 2", "General", "A2", "Available",
+                 requiresCalibration = true, calibrationDueDate = farFuture),
+            Tool(3, "T003", "SN003", "Tool 3", "General", "A3", "Available",
                  requiresCalibration = false)
         )
 

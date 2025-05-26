@@ -80,13 +80,13 @@ data class Chemical(
             entity = Chemical::class,
             parentColumns = ["id"],
             childColumns = ["chemical_id"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.RESTRICT
         ),
         ForeignKey(
             entity = User::class,
             parentColumns = ["id"],
             childColumns = ["user_id"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.RESTRICT
         )
     ],
     indices = [

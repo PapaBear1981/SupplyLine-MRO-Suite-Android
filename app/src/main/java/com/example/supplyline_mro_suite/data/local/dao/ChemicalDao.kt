@@ -97,18 +97,36 @@ interface ChemicalDao {
     """)
     fun getCriticalStockChemicals(): Flow<List<ChemicalWithUsage>>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertIssuance(issuance: ChemicalIssuance)
+
     @Transaction
-    suspend fun issueChemical(chemicalId: Int, quantityIssued: Double): Boolean {
-        val chemical = getChemicalById(chemicalId)
-        return if (chemical != null && chemical.quantity >= quantityIssued) {
-            val updatedChemical = chemical.copy(
+    suspend fun issueChemical(chemicalId: Int, quantityIssued: Double, userId: Int, location: String = "Unknown"): Boolean {
+        if (quantityIssued <= 0) return false
+
+        val chemical = getChemicalById(chemicalId) ?: return false
+        if (chemical.quantity < quantityIssued) return false
+
+        // 1) Insert issuance record
+        insertIssuance(
+            ChemicalIssuance(
+                id = 0,
+                chemicalId = chemicalId,
+                userId = userId,
+                quantityIssued = quantityIssued,
+                issueDate = java.time.LocalDateTime.now().toString(),
+                location = location,
+                issuedBy = "System" // TODO: Get from current user context
+            )
+        )
+
+        // 2) Update chemical quantity
+        updateChemical(
+            chemical.copy(
                 quantity = chemical.quantity - quantityIssued,
                 updatedAt = java.time.LocalDateTime.now().toString()
             )
-            updateChemical(updatedChemical)
-            true
-        } else {
-            false
-        }
+        )
+        return true
     }
 }

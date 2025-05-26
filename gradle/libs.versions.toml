@@ -1,7 +1,7 @@
 [versions]
 agp = "8.10.0"
-kotlin = "2.0.20"
-ksp = "2.0.20-1.0.25"
+kotlin = "2.0.21"
+ksp = "2.0.21-1.0.27"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -27,6 +27,9 @@ workManagerVersion = "2.9.1"
 splashScreenVersion = "1.0.1"
 coilVersion = "2.7.0"
 hiltVersion = "2.56.2"
+mockitoVersion = "5.7.0"
+mockitoKotlinVersion = "5.2.1"
+archCoreTestingVersion = "2.2.0"
 
 
 [libraries]
@@ -106,6 +109,9 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesVersion" }
 androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomVersion" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockitoVersion" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlinVersion" }
+androidx-arch-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "archCoreTestingVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

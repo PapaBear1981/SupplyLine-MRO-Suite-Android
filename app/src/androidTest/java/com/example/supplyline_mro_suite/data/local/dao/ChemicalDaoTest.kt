@@ -200,7 +200,7 @@ class ChemicalDaoTest {
         chemicalDao.insertChemical(chemical)
 
         // When
-        val success = chemicalDao.issueChemical(1, 30.0)
+        val success = chemicalDao.issueChemical(1, 30.0, 1) // userId = 1
         val updatedChemical = chemicalDao.getChemicalById(1)
 
         // Then
@@ -229,7 +229,7 @@ class ChemicalDaoTest {
         chemicalDao.insertChemical(chemical)
 
         // When
-        val success = chemicalDao.issueChemical(1, 30.0)
+        val success = chemicalDao.issueChemical(1, 30.0, 1) // userId = 1
         val unchangedChemical = chemicalDao.getChemicalById(1)
 
         // Then

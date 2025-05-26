@@ -34,7 +34,7 @@ class ToolCheckoutDaoTest {
             ApplicationProvider.getApplicationContext(),
             SupplyLineDatabase::class.java
         ).allowMainThreadQueries().build()
-        
+
         toolCheckoutDao = database.toolCheckoutDao()
         toolDao = database.toolDao()
         userDao = database.userDao()
@@ -117,11 +117,11 @@ class ToolCheckoutDaoTest {
         val user = User(1, "EMP001", "John Doe", "Maintenance")
         val tool1 = Tool(1, "T001", "SN001", "Tool 1", "General", "A1", "Available")
         val tool2 = Tool(2, "T002", "SN002", "Tool 2", "General", "A2", "Available")
-        
+
         val checkouts = listOf(
             ToolCheckout(1, 1, 1, "2024-01-01", "2024-01-07", checkedOutBy = "John Doe", isActive = true),
             ToolCheckout(2, 2, 1, "2024-01-02", "2024-01-08", checkedOutBy = "John Doe", isActive = true),
-            ToolCheckout(3, 1, 1, "2023-12-01", "2023-12-07", actualReturnDate = "2023-12-06", 
+            ToolCheckout(3, 1, 1, "2023-12-01", "2023-12-07", actualReturnDate = "2023-12-06",
                         checkedOutBy = "John Doe", isActive = false)
         )
 
@@ -145,11 +145,11 @@ class ToolCheckoutDaoTest {
         val user2 = User(2, "EMP002", "Jane Smith", "Materials")
         val tool1 = Tool(1, "T001", "SN001", "Tool 1", "General", "A1", "Available")
         val tool2 = Tool(2, "T002", "SN002", "Tool 2", "General", "A2", "Available")
-        
+
         val checkouts = listOf(
             ToolCheckout(1, 1, 1, "2024-01-01", "2024-01-07", checkedOutBy = "John Doe", isActive = true),
             ToolCheckout(2, 2, 2, "2024-01-02", "2024-01-08", checkedOutBy = "Jane Smith", isActive = true),
-            ToolCheckout(3, 1, 1, "2023-12-01", "2023-12-07", actualReturnDate = "2023-12-06", 
+            ToolCheckout(3, 1, 1, "2023-12-01", "2023-12-07", actualReturnDate = "2023-12-06",
                         checkedOutBy = "John Doe", isActive = false)
         )
 
@@ -166,68 +166,8 @@ class ToolCheckoutDaoTest {
         assertTrue(activeCheckouts.all { it.isActive })
     }
 
-    @Test
-    fun checkoutTool_transaction() = runTest {
-        // Given
-        val user = User(1, "EMP001", "John Doe", "Maintenance")
-        val tool = Tool(1, "T001", "SN001", "Test Tool", "General", "A1", "Available")
-        val checkout = ToolCheckout(
-            id = 1,
-            toolId = 1,
-            userId = 1,
-            checkoutDate = "2024-01-01",
-            expectedReturnDate = "2024-01-07",
-            checkedOutBy = "John Doe",
-            isActive = true
-        )
-
-        // When
-        userDao.insertUser(user)
-        toolDao.insertTool(tool)
-        toolCheckoutDao.checkoutTool(checkout, 1)
-        
-        val retrievedCheckout = toolCheckoutDao.getCheckoutById(1)
-        val retrievedTool = toolDao.getToolById(1)
-
-        // Then
-        assertNotNull(retrievedCheckout)
-        assertNotNull(retrievedTool)
-        assertEquals("Checked Out", retrievedTool?.status)
-        assertTrue(retrievedCheckout?.isActive == true)
-    }
-
-    @Test
-    fun returnTool_transaction() = runTest {
-        // Given
-        val user = User(1, "EMP001", "John Doe", "Maintenance")
-        val tool = Tool(1, "T001", "SN001", "Test Tool", "General", "A1", "Checked Out")
-        val checkout = ToolCheckout(
-            id = 1,
-            toolId = 1,
-            userId = 1,
-            checkoutDate = "2024-01-01",
-            expectedReturnDate = "2024-01-07",
-            checkedOutBy = "John Doe",
-            isActive = true
-        )
-
-        // When
-        userDao.insertUser(user)
-        toolDao.insertTool(tool)
-        toolCheckoutDao.insertCheckout(checkout)
-        toolCheckoutDao.returnTool(1, 1, "Good", "Returned in good condition")
-        
-        val retrievedCheckout = toolCheckoutDao.getCheckoutById(1)
-        val retrievedTool = toolDao.getToolById(1)
-
-        // Then
-        assertNotNull(retrievedCheckout)
-        assertNotNull(retrievedTool)
-        assertEquals("Available", retrievedTool?.status)
-        assertFalse(retrievedCheckout?.isActive == true)
-        assertEquals("Good", retrievedCheckout?.returnCondition)
-        assertNotNull(retrievedCheckout?.actualReturnDate)
-    }
+    // Note: Transaction tests moved to repository integration tests
+    // since transaction methods are now in the repository layer
 
     @Test
     fun getActiveCheckoutCount() = runTest {
@@ -235,11 +175,11 @@ class ToolCheckoutDaoTest {
         val user = User(1, "EMP001", "John Doe", "Maintenance")
         val tool1 = Tool(1, "T001", "SN001", "Tool 1", "General", "A1", "Available")
         val tool2 = Tool(2, "T002", "SN002", "Tool 2", "General", "A2", "Available")
-        
+
         val checkouts = listOf(
             ToolCheckout(1, 1, 1, "2024-01-01", "2024-01-07", checkedOutBy = "John Doe", isActive = true),
             ToolCheckout(2, 2, 1, "2024-01-02", "2024-01-08", checkedOutBy = "John Doe", isActive = true),
-            ToolCheckout(3, 1, 1, "2023-12-01", "2023-12-07", actualReturnDate = "2023-12-06", 
+            ToolCheckout(3, 1, 1, "2023-12-01", "2023-12-07", actualReturnDate = "2023-12-06",
                         checkedOutBy = "John Doe", isActive = false)
         )
 
