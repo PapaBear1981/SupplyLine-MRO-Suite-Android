@@ -2,10 +2,18 @@ package com.example.supplyline_mro_suite.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-@Entity(tableName = "users")
+@Entity(
+    tableName = "users",
+    indices = [
+        Index(value = ["employee_number"], unique = true),
+        Index(value = ["department"]),
+        Index(value = ["is_active"])
+    ]
+)
 data class User(
     @PrimaryKey
     @SerializedName("id")

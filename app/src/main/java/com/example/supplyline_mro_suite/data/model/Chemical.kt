@@ -2,10 +2,22 @@ package com.example.supplyline_mro_suite.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-@Entity(tableName = "chemicals")
+@Entity(
+    tableName = "chemicals",
+    indices = [
+        Index(value = ["part_number", "lot_number"], unique = true),
+        Index(value = ["status"]),
+        Index(value = ["category"]),
+        Index(value = ["location"]),
+        Index(value = ["expiration_date"]),
+        Index(value = ["is_archived"])
+    ]
+)
 data class Chemical(
     @PrimaryKey
     @SerializedName("id")
@@ -61,7 +73,28 @@ data class Chemical(
     val isArchived: Boolean = false
 )
 
-@Entity(tableName = "chemical_issuances")
+@Entity(
+    tableName = "chemical_issuances",
+    foreignKeys = [
+        ForeignKey(
+            entity = Chemical::class,
+            parentColumns = ["id"],
+            childColumns = ["chemical_id"],
+            onDelete = ForeignKey.RESTRICT
+        ),
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["id"],
+            childColumns = ["user_id"],
+            onDelete = ForeignKey.RESTRICT
+        )
+    ],
+    indices = [
+        Index(value = ["chemical_id"]),
+        Index(value = ["user_id"]),
+        Index(value = ["issue_date"])
+    ]
+)
 data class ChemicalIssuance(
     @PrimaryKey
     @SerializedName("id")
@@ -102,6 +135,26 @@ data class ChemicalWithIssuances(
     val issuances: List<ChemicalIssuance> = emptyList(),
     val totalIssued: Double = 0.0,
     val remainingQuantity: Double = 0.0
+)
+
+data class ChemicalWithUsage(
+    val id: Int,
+    @ColumnInfo(name = "part_number") val partNumber: String,
+    @ColumnInfo(name = "lot_number") val lotNumber: String,
+    val description: String,
+    val manufacturer: String,
+    val category: String,
+    val location: String,
+    val quantity: Double,
+    val unit: String,
+    @ColumnInfo(name = "expiration_date") val expirationDate: String,
+    @ColumnInfo(name = "minimum_stock_level") val minimumStockLevel: Double,
+    val status: String,
+    @ColumnInfo(name = "created_at") val createdAt: String?,
+    @ColumnInfo(name = "updated_at") val updatedAt: String?,
+    @ColumnInfo(name = "is_archived") val isArchived: Boolean,
+    @ColumnInfo(name = "total_issued") val totalIssued: Double,
+    @ColumnInfo(name = "remaining_quantity") val remainingQuantity: Double
 )
 
 data class IssueRequest(

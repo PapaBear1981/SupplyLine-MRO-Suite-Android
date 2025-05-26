@@ -27,8 +27,9 @@ import com.example.supplyline_mro_suite.presentation.screens.profile.ProfileScre
 import com.example.supplyline_mro_suite.presentation.screens.scanner.ScannerScreen
 import com.example.supplyline_mro_suite.ui.theme.SupplyLineMROSuiteTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-// Hilt temporarily removed
-// @AndroidEntryPoint
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()

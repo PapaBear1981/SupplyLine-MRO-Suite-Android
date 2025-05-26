@@ -2,8 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    // alias(libs.plugins.hilt.android)
-    // kotlin("kapt")
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -72,15 +72,15 @@ dependencies {
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    // Hilt - temporarily disabled
-    // implementation(libs.hilt.android)
-    // kapt(libs.hilt.compiler)
-    // implementation(libs.hilt.navigation.compose)
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
 
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    // kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
 
     // Networking
     implementation(libs.retrofit)
@@ -119,10 +119,20 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.androidx.arch.core.testing)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.androidx.arch.core.testing)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

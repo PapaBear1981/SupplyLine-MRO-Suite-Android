@@ -2,10 +2,22 @@ package com.example.supplyline_mro_suite.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-@Entity(tableName = "tools")
+@Entity(
+    tableName = "tools",
+    indices = [
+        Index(value = ["tool_number"], unique = true),
+        Index(value = ["serial_number"], unique = true),
+        Index(value = ["status"]),
+        Index(value = ["category"]),
+        Index(value = ["location"]),
+        Index(value = ["calibration_due_date"])
+    ]
+)
 data class Tool(
     @PrimaryKey
     @SerializedName("id")
@@ -58,7 +70,29 @@ data class Tool(
     val calibrationIntervalDays: Int? = null
 )
 
-@Entity(tableName = "tool_checkouts")
+@Entity(
+    tableName = "tool_checkouts",
+    foreignKeys = [
+        ForeignKey(
+            entity = Tool::class,
+            parentColumns = ["id"],
+            childColumns = ["tool_id"],
+            onDelete = ForeignKey.RESTRICT
+        ),
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["id"],
+            childColumns = ["user_id"],
+            onDelete = ForeignKey.RESTRICT
+        )
+    ],
+    indices = [
+        Index(value = ["tool_id"]),
+        Index(value = ["user_id"]),
+        Index(value = ["checkout_date"]),
+        Index(value = ["is_active"])
+    ]
+)
 data class ToolCheckout(
     @PrimaryKey
     @SerializedName("id")
@@ -123,6 +157,45 @@ data class CheckoutRequest(
 
     @SerializedName("notes")
     val notes: String? = null
+)
+
+// Data classes for advanced queries
+data class ToolWithCheckoutInfo(
+    val id: Int,
+    @ColumnInfo(name = "tool_number") val toolNumber: String,
+    @ColumnInfo(name = "serial_number") val serialNumber: String,
+    val description: String,
+    val category: String,
+    val location: String,
+    val status: String,
+    val condition: String?,
+    val notes: String?,
+    @ColumnInfo(name = "created_at") val createdAt: String?,
+    @ColumnInfo(name = "updated_at") val updatedAt: String?,
+    @ColumnInfo(name = "requires_calibration") val requiresCalibration: Boolean,
+    @ColumnInfo(name = "calibration_due_date") val calibrationDueDate: String?,
+    @ColumnInfo(name = "calibration_interval_days") val calibrationIntervalDays: Int?,
+    @ColumnInfo(name = "checkout_date") val checkoutDate: String?,
+    @ColumnInfo(name = "expected_return_date") val expectedReturnDate: String?,
+    @ColumnInfo(name = "checked_out_to_name") val checkedOutToName: String?
+)
+
+data class ToolUsageStats(
+    val id: Int,
+    @ColumnInfo(name = "tool_number") val toolNumber: String,
+    @ColumnInfo(name = "serial_number") val serialNumber: String,
+    val description: String,
+    val category: String,
+    val location: String,
+    val status: String,
+    val condition: String?,
+    val notes: String?,
+    @ColumnInfo(name = "created_at") val createdAt: String?,
+    @ColumnInfo(name = "updated_at") val updatedAt: String?,
+    @ColumnInfo(name = "requires_calibration") val requiresCalibration: Boolean,
+    @ColumnInfo(name = "calibration_due_date") val calibrationDueDate: String?,
+    @ColumnInfo(name = "calibration_interval_days") val calibrationIntervalDays: Int?,
+    @ColumnInfo(name = "checkout_count") val checkoutCount: Int
 )
 
 data class ReturnRequest(

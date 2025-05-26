@@ -1,6 +1,7 @@
 package com.example.supplyline_mro_suite
 
 import android.app.Application
-// Hilt temporarily removed
-// @HiltAndroidApp
+import dagger.hilt.android.HiltAndroidApp
+
+@HiltAndroidApp
 class SupplyLineApplication : Application()
