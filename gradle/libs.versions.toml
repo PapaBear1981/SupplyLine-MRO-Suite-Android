@@ -1,6 +1,7 @@
 [versions]
 agp = "8.10.0"
-kotlin = "2.0.21"
+kotlin = "2.0.20"
+ksp = "2.0.20-1.0.25"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -9,7 +10,7 @@ lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.2"
 composeBom = "2024.12.01"
 navigationCompose = "2.8.4"
-hiltAndroid = "2.44"
+hiltAndroid = "2.56.2"
 hiltNavigationCompose = "1.2.0"
 roomVersion = "2.6.1"
 retrofitVersion = "2.11.0"
@@ -25,7 +26,7 @@ dataStoreVersion = "1.1.1"
 workManagerVersion = "2.9.1"
 splashScreenVersion = "1.0.1"
 coilVersion = "2.7.0"
-hiltVersion = "2.44"
+hiltVersion = "2.56.2"
 
 
 [libraries]
@@ -110,4 +111,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

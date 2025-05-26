@@ -6,13 +6,13 @@ import com.example.supplyline_mro_suite.data.repository.ToolRepository
 import com.example.supplyline_mro_suite.data.repository.ToolStats
 import com.example.supplyline_mro_suite.data.model.Tool
 import com.example.supplyline_mro_suite.data.model.ToolCheckout
-// Hilt temporarily removed
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-// import javax.inject.Inject
+import javax.inject.Inject
 
-// @HiltViewModel
-class DashboardViewModel constructor(
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
     private val toolRepository: ToolRepository
 ) : ViewModel() {
 

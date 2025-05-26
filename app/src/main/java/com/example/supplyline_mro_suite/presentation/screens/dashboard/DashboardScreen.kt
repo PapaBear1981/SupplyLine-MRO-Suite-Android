@@ -24,13 +24,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-// Hilt temporarily removed
-// import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.supplyline_mro_suite.presentation.components.BottomNavigationBar
 import com.example.supplyline_mro_suite.presentation.navigation.Screen
 import com.example.supplyline_mro_suite.presentation.viewmodel.DashboardViewModel
+import com.example.supplyline_mro_suite.presentation.viewmodel.DashboardUiState
 import com.example.supplyline_mro_suite.ui.theme.*
 import kotlinx.coroutines.delay
 
@@ -38,12 +38,10 @@ import kotlinx.coroutines.delay
 @Composable
 fun DashboardScreen(
     navController: NavController,
-    // viewModel: DashboardViewModel = hiltViewModel() // Temporarily disabled
+    viewModel: DashboardViewModel = hiltViewModel()
 ) {
-    // Temporary placeholder values
-    val isRefreshing = false
-    // val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    // val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullToRefreshState = rememberPullToRefreshState()
 
     Scaffold(
@@ -87,31 +85,29 @@ fun DashboardScreen(
     ) { paddingValues ->
         PullToRefreshBox(
             isRefreshing = isRefreshing,
-            onRefresh = { /* viewModel.refresh() */ },
+            onRefresh = { viewModel.refresh() },
             state = pullToRefreshState,
             modifier = Modifier.padding(paddingValues)
         ) {
-            // Temporarily show content directly
             DashboardContent(
-                uiState = null,
+                uiState = uiState,
                 navController = navController,
-                onAlertDismiss = { /* alertId -> viewModel.dismissAlert(alertId) */ }
+                onAlertDismiss = { alertId -> /* TODO: Implement alert dismissal */ }
             )
         }
 
-        // Error handling temporarily disabled
-        // uiState.error?.let { error ->
-        //     LaunchedEffect(error) {
-        //         // Show snackbar or error dialog
-        //         viewModel.clearError()
-        //     }
-        // }
+        uiState.error?.let { error ->
+            LaunchedEffect(error) {
+                // Show snackbar or error dialog
+                viewModel.clearError()
+            }
+        }
     }
 }
 
 @Composable
 fun DashboardContent(
-    uiState: Any? = null, // Placeholder for now
+    uiState: DashboardUiState,
     modifier: Modifier = Modifier,
     navController: NavController,
     onAlertDismiss: (String) -> Unit = {}
