@@ -18,13 +18,7 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideSupplyLineDatabase(@ApplicationContext context: Context): SupplyLineDatabase {
-        return Room.databaseBuilder(
-            context.applicationContext,
-            SupplyLineDatabase::class.java,
-            "supplyline_database"
-        )
-        .fallbackToDestructiveMigration()
-        .build()
+        return SupplyLineDatabase.getDatabase(context)
     }
 
     @Provides
