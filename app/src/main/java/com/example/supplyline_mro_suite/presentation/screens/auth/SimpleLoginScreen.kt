@@ -20,6 +20,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,22 +30,31 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.supplyline_mro_suite.data.auth.AuthResult
+import com.example.supplyline_mro_suite.data.auth.ValidationResult
 import com.example.supplyline_mro_suite.presentation.navigation.Screen
+import com.example.supplyline_mro_suite.presentation.viewmodel.AuthViewModel
 import com.example.supplyline_mro_suite.ui.theme.*
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SimpleLoginScreen(navController: NavController) {
+fun SimpleLoginScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
     var employeeNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val passwordFocusRequester = remember { FocusRequester() }
+
+    // Observe authentication state
+    val authState by authViewModel.authState.collectAsState()
+    val isLoading = authState.isLoading
 
     // Animation states
     val animationProgress by animateFloatAsState(
@@ -58,42 +69,26 @@ fun SimpleLoginScreen(navController: NavController) {
         label = "logo_scale"
     )
 
-    // Handle login
-    fun performLogin() {
-        when {
-            employeeNumber.isBlank() -> {
-                errorMessage = "Employee number is required"
-                return
-            }
-            password.isBlank() -> {
-                errorMessage = "Password is required"
-                return
-            }
-            password.length < 6 -> {
-                errorMessage = "Password must be at least 6 characters"
-                return
-            }
-        }
-
-        isLoading = true
-        errorMessage = ""
-    }
-
-    // Simulate authentication
-    LaunchedEffect(isLoading) {
-        if (isLoading) {
-            delay(2000) // Simulate network call
-
-            // Simple validation - in real app this would be API call
-            if (employeeNumber == "ADMIN001" && password == "password123") {
+    // Handle authentication result
+    LaunchedEffect(authState) {
+        val result = authState.result
+        when (result) {
+            is AuthResult.Success -> {
                 navController.navigate(Screen.Dashboard.route) {
                     popUpTo(Screen.Login.route) { inclusive = true }
                 }
-            } else {
-                errorMessage = "Invalid credentials. Try ADMIN001 / password123"
-                isLoading = false
             }
+            is AuthResult.Error -> {
+                errorMessage = result.message
+            }
+            null -> { /* No result yet */ }
         }
+    }
+
+    // Handle login
+    fun performLogin() {
+        errorMessage = ""
+        authViewModel.authenticate(employeeNumber, password)
     }
 
     // Gradient background
@@ -180,42 +175,8 @@ fun SimpleLoginScreen(navController: NavController) {
                         fontSize = 14.sp,
                         color = AerospaceSecondary,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 32.dp)
                     )
-
-                    // Demo credentials hint
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 24.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = AerospacePrimary.copy(alpha = 0.1f)
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "Demo Credentials",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = AerospacePrimary,
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            )
-                            Text(
-                                text = "Employee: ADMIN001",
-                                fontSize = 11.sp,
-                                color = AerospaceSecondary
-                            )
-                            Text(
-                                text = "Password: password123",
-                                fontSize = 11.sp,
-                                color = AerospaceSecondary
-                            )
-                        }
-                    }
 
                     // Employee Number field
                     OutlinedTextField(
@@ -316,7 +277,9 @@ fun SimpleLoginScreen(navController: NavController) {
                     ) {
                         if (isLoading) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .semantics { contentDescription = "Loading" },
                                 color = Color.White,
                                 strokeWidth = 2.dp
                             )

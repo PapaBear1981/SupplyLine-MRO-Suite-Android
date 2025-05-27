@@ -14,15 +14,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.supplyline_mro_suite.presentation.navigation.Screen
+import com.example.supplyline_mro_suite.presentation.viewmodel.AuthViewModel
 import com.example.supplyline_mro_suite.ui.theme.*
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavController) {
-    // For now, always go to login - in full implementation this would check auth state
-
+fun SplashScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
     // Animation states
     val infiniteTransition = rememberInfiniteTransition(label = "splash_animation")
 
@@ -46,13 +49,28 @@ fun SplashScreen(navController: NavController) {
         label = "logo_alpha"
     )
 
-    // Handle navigation after splash delay
+    // Handle navigation after splash delay with auth state checking
     LaunchedEffect(Unit) {
-        delay(2000) // Show splash for 2 seconds
+        try {
+            delay(1500) // Reduced delay for better UX
 
-        // For now, always navigate to login
-        navController.navigate(Screen.Login.route) {
-            popUpTo(Screen.Splash.route) { inclusive = true }
+            // Check authentication state
+            val isAuthenticated = authViewModel.checkAuthenticationState()
+
+            if (isAuthenticated) {
+                navController.navigate(Screen.Dashboard.route) {
+                    popUpTo(Screen.Splash.route) { inclusive = true }
+                }
+            } else {
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(Screen.Splash.route) { inclusive = true }
+                }
+            }
+        } catch (e: Exception) {
+            // Handle navigation error - fallback to login
+            navController.navigate(Screen.Login.route) {
+                popUpTo(Screen.Splash.route) { inclusive = true }
+            }
         }
     }
 

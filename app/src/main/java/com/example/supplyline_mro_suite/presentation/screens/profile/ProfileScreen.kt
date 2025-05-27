@@ -20,15 +20,20 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.supplyline_mro_suite.presentation.components.BottomNavigationBar
 import com.example.supplyline_mro_suite.presentation.navigation.Screen
+import com.example.supplyline_mro_suite.presentation.viewmodel.AuthViewModel
 import com.example.supplyline_mro_suite.ui.theme.*
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
     var isLoading by remember { mutableStateOf(true) }
 
     // Simulate loading
@@ -76,7 +81,8 @@ fun ProfileScreen(navController: NavController) {
         } else {
             ProfileContent(
                 modifier = Modifier.padding(paddingValues),
-                navController = navController
+                navController = navController,
+                authViewModel = authViewModel
             )
         }
     }
@@ -85,7 +91,8 @@ fun ProfileScreen(navController: NavController) {
 @Composable
 fun ProfileContent(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    authViewModel: AuthViewModel
 ) {
     LazyColumn(
         modifier = modifier
@@ -147,6 +154,7 @@ fun ProfileContent(
                         onClick = {
                             when (menuItem.title) {
                                 "Logout" -> {
+                                    authViewModel.logout()
                                     navController.navigate(Screen.Login.route) {
                                         popUpTo(0) { inclusive = true }
                                     }
