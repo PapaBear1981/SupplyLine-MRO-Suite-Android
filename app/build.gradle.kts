@@ -43,6 +43,9 @@ android {
     buildFeatures {
         compose = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "2.0.21"
+    }
 
     packaging {
         resources {
@@ -115,6 +118,9 @@ dependencies {
     // Image Loading
     implementation(libs.coil.compose)
 
+    // Biometric Authentication
+    implementation(libs.androidx.biometric)
+
 
 
     // Testing
@@ -124,6 +130,7 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.androidx.arch.core.testing)
+    testImplementation("io.mockk:mockk:1.13.8")
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -132,7 +139,7 @@ dependencies {
     androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.arch.core.testing)
     androidTestImplementation(libs.kotlinx.coroutines.test)
-
+    androidTestImplementation("io.mockk:mockk-android:1.13.8")
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

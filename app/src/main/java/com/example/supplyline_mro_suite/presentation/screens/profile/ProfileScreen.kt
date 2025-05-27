@@ -20,23 +20,28 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.supplyline_mro_suite.presentation.components.BottomNavigationBar
 import com.example.supplyline_mro_suite.presentation.navigation.Screen
+import com.example.supplyline_mro_suite.presentation.viewmodel.AuthViewModel
 import com.example.supplyline_mro_suite.ui.theme.*
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
     var isLoading by remember { mutableStateOf(true) }
-    
+
     // Simulate loading
     LaunchedEffect(Unit) {
         delay(600)
         isLoading = false
     }
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -76,7 +81,8 @@ fun ProfileScreen(navController: NavController) {
         } else {
             ProfileContent(
                 modifier = Modifier.padding(paddingValues),
-                navController = navController
+                navController = navController,
+                authViewModel = authViewModel
             )
         }
     }
@@ -85,7 +91,8 @@ fun ProfileScreen(navController: NavController) {
 @Composable
 fun ProfileContent(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    authViewModel: AuthViewModel
 ) {
     LazyColumn(
         modifier = modifier
@@ -97,7 +104,7 @@ fun ProfileContent(
         item {
             AnimatedProfileHeader()
         }
-        
+
         // Quick stats
         item {
             Text(
@@ -106,7 +113,7 @@ fun ProfileContent(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -118,7 +125,7 @@ fun ProfileContent(
                     color = AerospacePrimary,
                     modifier = Modifier.weight(1f)
                 )
-                
+
                 StatCard(
                     title = "Chemicals Used",
                     value = "12",
@@ -128,7 +135,7 @@ fun ProfileContent(
                 )
             }
         }
-        
+
         // Menu items
         item {
             Text(
@@ -137,7 +144,7 @@ fun ProfileContent(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            
+
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -147,6 +154,7 @@ fun ProfileContent(
                         onClick = {
                             when (menuItem.title) {
                                 "Logout" -> {
+                                    authViewModel.logout()
                                     navController.navigate(Screen.Login.route) {
                                         popUpTo(0) { inclusive = true }
                                     }
@@ -166,23 +174,23 @@ fun ProfileContent(
 @Composable
 fun AnimatedProfileHeader() {
     var visible by remember { mutableStateOf(false) }
-    
+
     LaunchedEffect(Unit) {
         visible = true
     }
-    
+
     val scale by animateFloatAsState(
         targetValue = if (visible) 1f else 0.8f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "profile_header_scale"
     )
-    
+
     val alpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
         animationSpec = tween(500),
         label = "profile_header_alpha"
     )
-    
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -215,22 +223,22 @@ fun AnimatedProfileHeader() {
                     color = Color.White
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Text(
                 text = "Chris Bear",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = AerospacePrimary
             )
-            
+
             Text(
                 text = "Employee #: ADMIN001",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
-            
+
             Text(
                 text = "Materials Department",
                 fontSize = 14.sp,
@@ -268,16 +276,16 @@ fun StatCard(
                 tint = color,
                 modifier = Modifier.size(32.dp)
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = value,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = color
             )
-            
+
             Text(
                 text = title,
                 fontSize = 12.sp,
@@ -293,18 +301,18 @@ fun AnimatedMenuItem(
     onClick: () -> Unit
 ) {
     var visible by remember { mutableStateOf(false) }
-    
+
     LaunchedEffect(menuItem) {
         delay(100)
         visible = true
     }
-    
+
     val alpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
         animationSpec = tween(300),
         label = "menu_item_alpha"
     )
-    
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -328,16 +336,16 @@ fun AnimatedMenuItem(
                 tint = menuItem.color,
                 modifier = Modifier.size(24.dp)
             )
-            
+
             Spacer(modifier = Modifier.width(16.dp))
-            
+
             Text(
                 text = menuItem.title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(1f)
             )
-            
+
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,

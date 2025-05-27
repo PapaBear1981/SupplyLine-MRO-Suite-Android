@@ -19,12 +19,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.supplyline_mro_suite.presentation.navigation.Screen
-import com.example.supplyline_mro_suite.presentation.screens.auth.LoginScreen
+import com.example.supplyline_mro_suite.presentation.screens.auth.SimpleLoginScreen
 import com.example.supplyline_mro_suite.presentation.screens.dashboard.DashboardScreen
 import com.example.supplyline_mro_suite.presentation.screens.tools.ToolsScreen
 import com.example.supplyline_mro_suite.presentation.screens.chemicals.ChemicalsScreen
 import com.example.supplyline_mro_suite.presentation.screens.profile.ProfileScreen
 import com.example.supplyline_mro_suite.presentation.screens.scanner.ScannerScreen
+import com.example.supplyline_mro_suite.presentation.screens.splash.SplashScreen
 import com.example.supplyline_mro_suite.ui.theme.SupplyLineMROSuiteTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
 fun SupplyLineNavigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.route,
+        startDestination = Screen.Splash.route,
         modifier = Modifier.fillMaxSize(),
         enterTransition = {
             slideInHorizontally(
@@ -85,8 +86,12 @@ fun SupplyLineNavigation(navController: NavHostController) {
             ) + fadeOut(animationSpec = tween(300))
         }
     ) {
+        composable(Screen.Splash.route) {
+            SplashScreen(navController = navController)
+        }
+
         composable(Screen.Login.route) {
-            LoginScreen(navController = navController)
+            SimpleLoginScreen(navController = navController)
         }
 
         composable(Screen.Dashboard.route) {
