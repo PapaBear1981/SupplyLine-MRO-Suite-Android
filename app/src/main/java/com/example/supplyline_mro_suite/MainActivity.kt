@@ -30,16 +30,24 @@ import com.example.supplyline_mro_suite.presentation.screens.chemicals.Chemicals
 import com.example.supplyline_mro_suite.presentation.screens.profile.ProfileScreen
 import com.example.supplyline_mro_suite.presentation.screens.scanner.ScannerScreen
 import com.example.supplyline_mro_suite.presentation.screens.splash.SplashScreen
+import com.example.supplyline_mro_suite.data.repository.SampleDataInitializer
+import javax.inject.Inject
 import com.example.supplyline_mro_suite.ui.theme.SupplyLineMROSuiteTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var sampleDataInitializer: SampleDataInitializer
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Initialize sample data
+        sampleDataInitializer.initializeSampleData()
 
         setContent {
             SupplyLineMROSuiteTheme {
