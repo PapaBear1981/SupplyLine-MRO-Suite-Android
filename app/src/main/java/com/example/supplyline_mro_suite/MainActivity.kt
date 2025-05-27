@@ -18,10 +18,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
 import com.example.supplyline_mro_suite.presentation.navigation.Screen
 import com.example.supplyline_mro_suite.presentation.screens.auth.SimpleLoginScreen
 import com.example.supplyline_mro_suite.presentation.screens.dashboard.DashboardScreen
 import com.example.supplyline_mro_suite.presentation.screens.tools.ToolsScreen
+import com.example.supplyline_mro_suite.presentation.screens.tools.ToolDetailScreen
+import com.example.supplyline_mro_suite.presentation.screens.tools.ToolCheckoutScreen
 import com.example.supplyline_mro_suite.presentation.screens.chemicals.ChemicalsScreen
 import com.example.supplyline_mro_suite.presentation.screens.profile.ProfileScreen
 import com.example.supplyline_mro_suite.presentation.screens.scanner.ScannerScreen
@@ -112,6 +116,22 @@ fun SupplyLineNavigation(navController: NavHostController) {
 
         composable(Screen.Scanner.route) {
             ScannerScreen(navController = navController)
+        }
+
+        composable(
+            route = Screen.ToolDetail.route,
+            arguments = listOf(navArgument("toolId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val toolId = backStackEntry.arguments?.getInt("toolId") ?: 0
+            ToolDetailScreen(navController = navController, toolId = toolId.toString())
+        }
+
+        composable(
+            route = Screen.CheckoutTool.route,
+            arguments = listOf(navArgument("toolId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val toolId = backStackEntry.arguments?.getInt("toolId") ?: 0
+            ToolCheckoutScreen(navController = navController, toolId = toolId)
         }
     }
 }
