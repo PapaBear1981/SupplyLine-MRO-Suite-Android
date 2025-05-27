@@ -175,8 +175,48 @@ fun SimpleLoginScreen(
                         fontSize = 14.sp,
                         color = AerospaceSecondary,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(bottom = 32.dp)
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
+
+                    // Demo credentials hint
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 24.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = AerospacePrimary.copy(alpha = 0.1f)
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Demo Credentials",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = AerospacePrimary,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                            Text(
+                                text = "Employee: ADMIN001",
+                                fontSize = 11.sp,
+                                color = AerospaceSecondary
+                            )
+                            Text(
+                                text = "Password: Password123!",
+                                fontSize = 11.sp,
+                                color = AerospaceSecondary
+                            )
+                            Text(
+                                text = "(8+ chars, uppercase, lowercase, digits)",
+                                fontSize = 10.sp,
+                                color = AerospaceSecondary.copy(alpha = 0.7f),
+                                modifier = Modifier.padding(top = 2.dp)
+                            )
+                        }
+                    }
 
                     // Employee Number field
                     OutlinedTextField(
