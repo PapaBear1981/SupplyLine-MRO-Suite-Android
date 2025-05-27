@@ -18,24 +18,36 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
 import com.example.supplyline_mro_suite.presentation.navigation.Screen
 import com.example.supplyline_mro_suite.presentation.screens.auth.SimpleLoginScreen
 import com.example.supplyline_mro_suite.presentation.screens.dashboard.DashboardScreen
 import com.example.supplyline_mro_suite.presentation.screens.tools.ToolsScreen
+import com.example.supplyline_mro_suite.presentation.screens.tools.ToolDetailScreen
+import com.example.supplyline_mro_suite.presentation.screens.tools.ToolCheckoutScreen
 import com.example.supplyline_mro_suite.presentation.screens.chemicals.ChemicalsScreen
 import com.example.supplyline_mro_suite.presentation.screens.profile.ProfileScreen
 import com.example.supplyline_mro_suite.presentation.screens.scanner.ScannerScreen
 import com.example.supplyline_mro_suite.presentation.screens.splash.SplashScreen
+import com.example.supplyline_mro_suite.data.repository.SampleDataInitializer
+import javax.inject.Inject
 import com.example.supplyline_mro_suite.ui.theme.SupplyLineMROSuiteTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var sampleDataInitializer: SampleDataInitializer
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Initialize sample data
+        sampleDataInitializer.initializeSampleData()
 
         setContent {
             SupplyLineMROSuiteTheme {
@@ -112,6 +124,22 @@ fun SupplyLineNavigation(navController: NavHostController) {
 
         composable(Screen.Scanner.route) {
             ScannerScreen(navController = navController)
+        }
+
+        composable(
+            route = Screen.ToolDetail.route,
+            arguments = listOf(navArgument("toolId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val toolId = backStackEntry.arguments?.getInt("toolId") ?: 0
+            ToolDetailScreen(navController = navController, toolId = toolId.toString())
+        }
+
+        composable(
+            route = Screen.CheckoutTool.route,
+            arguments = listOf(navArgument("toolId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val toolId = backStackEntry.arguments?.getInt("toolId") ?: 0
+            ToolCheckoutScreen(navController = navController, toolId = toolId)
         }
     }
 }

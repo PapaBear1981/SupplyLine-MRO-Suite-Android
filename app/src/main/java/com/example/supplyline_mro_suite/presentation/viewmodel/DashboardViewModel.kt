@@ -202,7 +202,7 @@ class DashboardViewModel @Inject constructor(
 
             try {
                 // Sync data from server
-                toolRepository.syncTools().collect { result ->
+                toolRepository.syncToolsWithResult().collect { result ->
                     result.onSuccess {
                         loadDashboardData()
                     }.onFailure { e ->
